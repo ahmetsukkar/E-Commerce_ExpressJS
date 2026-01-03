@@ -10,7 +10,7 @@ export interface IProduct extends Document {
     updatedAt: Date;
 }
 
-const ProductSchema: Schema = new Schema({
+const ProductSchema: Schema = new Schema<IProduct>({
     title: { type: String, required: true },
     description: { type: String },
     image: { type: String, required: true },
