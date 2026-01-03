@@ -1,4 +1,5 @@
 import { cartModel } from "../models/cartModel";
+import productModel from "../models/productModel";
 
 interface CreateCartForUser {
   userId: string;
@@ -14,7 +15,9 @@ interface GetActiveCartForUser {
   userId: string;
 }
 
-export const getActiveCartForUser = async ({userId}: GetActiveCartForUser) => {
+export const getActiveCartForUser = async ({
+  userId,
+}: GetActiveCartForUser) => {
   let cart = await cartModel.findOne({ userId, status: "active" });
 
   if (!cart) {
@@ -22,4 +25,45 @@ export const getActiveCartForUser = async ({userId}: GetActiveCartForUser) => {
   }
 
   return cart;
+};
+
+interface AddItemToCart {
+  userId: string;
+  productId: any;
+  quantity: number;
+}
+
+export const addItemToCart = async ({
+  userId,
+  productId,
+  quantity,
+}: AddItemToCart) => {
+  const cart = await getActiveCartForUser({ userId });
+  const existInCart = await cart.items.find((item) => item.product.toString() === productId);
+  console.log("cart:", cart);
+  console.log("Exist in cart:", existInCart);
+
+  if (existInCart) {
+    return { data: "Item already in cart", statusCode: 400 };
+  }
+
+  const product = await productModel.findById(productId);
+  if (!product) {
+    return { data: "Product not found", statusCode: 400 };
+  }
+
+  if (product.stock < quantity) {
+    return { data: "Insufficient stock", statusCode: 400 };
+  }
+
+  cart.items.push({
+    product: productId,
+    unitPrice: product.price,
+    quantity,
+  });
+
+  cart.totalAmount += product.price * quantity;
+
+  const updatedCart = await cart.save();
+  return { data: updatedCart, statusCode: 200 };
 };
