@@ -16,8 +16,7 @@ const validateJWT = (req: ExtendRequest, res: Response, next: NextFunction) => {
     return;
   }
 
-  const jwt_secret_key = "QeIYQEWweBKu5sSCSrHxjwvVpGaZI65O";
-  jwt.verify(token, jwt_secret_key, async (err, payload) => {
+  jwt.verify(token, process.env.JWT_SECRET || '', async (err, payload) => {
     if (err) {
       res.status(403).send("Invalid or expired token");
       return;

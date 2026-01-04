@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
 import express from "express";
 import mongoose from "mongoose";
 import userRoutes from "./routes/userRoute";
 import productRoute from "./routes/productRoute";
 import cartRoute from "./routes/cartRoute";
 import { seedInitialProducts } from "./services/productService";
+import { errorHandler } from "./middlewares/errorHandler";
+
+dotenv.config();
 
 const app = express();
 const PORT = 5001;
@@ -11,15 +15,19 @@ const PORT = 5001;
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://localhost:27017/ecommerce")
+  .connect(process.env.CONNECTION_STRING || '')
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Failed to connect to MongoDB", err));
 
-  seedInitialProducts();
+seedInitialProducts()
+.catch((error) => console.error('Error seeding products:', error));
 
 app.use("/user", userRoutes);
 app.use("/product", productRoute);
 app.use("/cart", cartRoute);
+
+// Error handler must be last
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

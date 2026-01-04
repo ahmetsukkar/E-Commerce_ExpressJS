@@ -1,6 +1,7 @@
 import userModel from "../models/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { AppError } from "../middlewares/errorHandler";
 
 interface RegisterParams {
   firstName: string;
@@ -18,7 +19,7 @@ export const register = async ({
   var user = await userModel.findOne({ email });
 
   if (user) {
-    return { data: "user already exists!", statusCode: 400 };
+    throw new AppError("user already exists!", 400);
   }
 
   var hashedPassword = await bcrypt.hash(password, 10);
@@ -44,18 +45,12 @@ export const login = async ({ email, password }: LoginParams) => {
   const user = await userModel.findOne({ email });
 
   if (!user) {
-    return {
-      data: "invalid credentials! incorrect email or password",
-      statusCode: 400,
-    };
+    throw new AppError("invalid credentials! incorrect email or password", 400);
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    return {
-      data: "invalid credentials! incorrect email or password",
-      statusCode: 400,
-    };
+    throw new AppError("invalid credentials! incorrect email or password", 400);
   }
 
   return {
@@ -69,6 +64,5 @@ export const login = async ({ email, password }: LoginParams) => {
 };
 
 const generateToken = (payloadData: any) => {
-  const jwt_secret_key = "QeIYQEWweBKu5sSCSrHxjwvVpGaZI65O";
-  return jwt.sign(payloadData, jwt_secret_key, { expiresIn: "24h" });
+  return jwt.sign(payloadData, process.env.JWT_SECRET || '', { expiresIn: "24h" });
 };

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { cartModel, ICartItem } from "../models/cartModel";
 import { IOrderItem, orderModel } from "../models/orderModel";
 import productModel from "../models/productModel";
+import { AppError } from "../middlewares/errorHandler";
 
 interface CreateCartForUser {
   userId: string;
@@ -44,20 +45,18 @@ export const addItemToCart = async ({
   const existInCart = await cart.items.find(
     (item) => item.product.toString() === productId
   );
-  console.log("cart:", cart);
-  console.log("Exist in cart:", existInCart);
 
   if (existInCart) {
-    return { data: "Item already in cart", statusCode: 400 };
+    throw new AppError("Item already in cart", 400);
   }
 
   const product = await productModel.findById(productId);
   if (!product) {
-    return { data: "Product not found", statusCode: 400 };
+    throw new AppError("Product not found", 400);
   }
 
   if (product.stock < quantity) {
-    return { data: "Insufficient stock", statusCode: 400 };
+    throw new AppError("Insufficient stock", 400);
   }
 
   cart.items.push({
@@ -88,16 +87,16 @@ export const updateItemInCart = async ({
   );
 
   if (!existInCart) {
-    return { data: "Item not found in cart", statusCode: 400 };
+    throw new AppError("Item not found in cart", 400);
   }
 
   const product = await productModel.findById(productId);
   if (!product) {
-    return { data: "Product not found", statusCode: 400 };
+    throw new AppError("Product not found", 400);
   }
 
   if (product.stock < quantity) {
-    return { data: "Insufficient stock", statusCode: 400 };
+    throw new AppError("Insufficient stock", 400);
   }
 
   const otherCartItems = cart.items.filter(
@@ -130,7 +129,7 @@ export const deleteItemInCart = async ({
   console.log(cart);
 
   if (!existInCart) {
-    return { data: "Item not found in cart", statusCode: 400 };
+    throw new AppError("Item not found in cart", 400);
   }
 
   const otherCartItems = cart.items.filter(
@@ -172,7 +171,7 @@ interface CheckOut {
 }
 
 export const checkout = async ({ userId, address }: CheckOut) => {
-  if (!address) return { data: "Please add the address", statusCode: 400 };
+  if (!address) throw new AppError("Please add the address", 400);
 
   const cart = await getActiveCartForUser({ userId });
 
@@ -193,7 +192,7 @@ export const checkout = async ({ userId, address }: CheckOut) => {
     const product = productMap.get(item.product._id.toString());
 
     if (!product) {
-      return { data: "Product not found", statusCode: 400 };
+      throw new AppError("Product not found", 400);
     }
 
     const orderItem: IOrderItem = {
