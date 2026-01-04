@@ -1,4 +1,6 @@
+import { Types } from "mongoose";
 import { cartModel, ICartItem } from "../models/cartModel";
+import { IOrderItem, orderModel } from "../models/orderModel";
 import productModel from "../models/productModel";
 
 interface CreateCartForUser {
@@ -162,4 +164,59 @@ export const clearCart = async ({ userId }: ClearCart) => {
   cart.totalAmount = 0;
   const updatedCart = await cart.save();
   return { data: updatedCart, statusCode: 200 };
+};
+
+interface CheckOut {
+  userId: string;
+  address: string;
+}
+
+export const checkout = async ({ userId, address }: CheckOut) => {
+  if (!address) return { data: "Please add the address", statusCode: 400 };
+
+  const cart = await getActiveCartForUser({ userId });
+
+  const orderItems: IOrderItem[] = [];
+
+  const productIds: Types.ObjectId[] = cart.items.map((item) => {
+    const pid = (item.product as any)._id ?? item.product;
+    return new Types.ObjectId(pid);
+  });
+
+  const products = await productModel.find({ _id: { $in: productIds } });
+
+  const productMap = new Map(
+    products.map((product) => [product._id.toString(), product])
+  );
+
+  cart.items.forEach((item) => {
+    const product = productMap.get(item.product._id.toString());
+
+    if (!product) {
+      return { data: "Product not found", statusCode: 400 };
+    }
+
+    const orderItem: IOrderItem = {
+      ProductTitle: product.title,
+      ProductImage: product.image,
+      Quantity: item.quantity,
+      UnitProce: item.unitPrice,
+    };
+
+    orderItems.push(orderItem);
+  });
+
+  const order = await orderModel.create({
+    orderItems,
+    total: cart.totalAmount,
+    address,
+    userId,
+  });
+
+  await order.save();
+
+  cart.status = "completed";
+  await cart.save();
+
+  return { data: order, statusCode: 200 };
 };
