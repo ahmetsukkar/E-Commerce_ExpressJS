@@ -18,8 +18,8 @@ router.get(
   validateJWT,
   asyncHandler(async (req: ExtendRequest, res: Response) => {
     const userId = req?.user?._id;
-    const cart = await getActiveCartForUser({ userId });
-    res.status(200).send(cart);
+    const response = await getActiveCartForUser({ userId });
+    res.status(response.statusCode).send(response.data);
   })
 );
 

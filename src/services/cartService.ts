@@ -27,7 +27,7 @@ export const getActiveCartForUser = async ({
     cart = await createCartForUser({ userId });
   }
 
-  return cart;
+  return { data: cart, statusCode: 200 };
 };
 
 interface AddItemToCart {
@@ -41,7 +41,8 @@ export const addItemToCart = async ({
   productId,
   quantity,
 }: AddItemToCart) => {
-  const cart = await getActiveCartForUser({ userId });
+  const response = await getActiveCartForUser({ userId });
+  const cart = response.data;
   const existInCart = await cart.items.find(
     (item) => item.product.toString() === productId
   );
@@ -81,7 +82,8 @@ export const updateItemInCart = async ({
   productId,
   quantity,
 }: UpdateItemInCart) => {
-  const cart = await getActiveCartForUser({ userId });
+  const response = await getActiveCartForUser({ userId });
+  const cart = response.data;
   const existInCart = await cart.items.find(
     (item) => item.product.toString() === productId
   );
@@ -122,7 +124,8 @@ export const deleteItemInCart = async ({
   userId,
   productId,
 }: DeleteItemInCart) => {
-  const cart = await getActiveCartForUser({ userId });
+  const response = await getActiveCartForUser({ userId });
+  const cart = response.data;
   const existInCart = await cart.items.find(
     (item) => item.product.toString() === productId
   );
@@ -158,7 +161,8 @@ interface ClearCart {
 }
 
 export const clearCart = async ({ userId }: ClearCart) => {
-  const cart = await getActiveCartForUser({ userId });
+  const response = await getActiveCartForUser({ userId });
+  const cart = response.data;
   cart.items = [];
   cart.totalAmount = 0;
   const updatedCart = await cart.save();
@@ -173,7 +177,8 @@ interface CheckOut {
 export const checkout = async ({ userId, address }: CheckOut) => {
   if (!address) throw new AppError("Please add the address", 400);
 
-  const cart = await getActiveCartForUser({ userId });
+  const response = await getActiveCartForUser({ userId });
+  const cart = response.data;
 
   const orderItems: IOrderItem[] = [];
 

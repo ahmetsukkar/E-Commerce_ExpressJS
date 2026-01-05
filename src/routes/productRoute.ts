@@ -14,16 +14,16 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (req: ExtendRequest, res: Response) => {
-    const products = await getAllProducts();
-    res.status(200).send(products);
+    const response = await getAllProducts();
+    res.status(response.statusCode).send(response.data);
   })
 );
 
 router.get(
   "/:id",
   asyncHandler(async (req: ExtendRequest, res: Response) => {
-    const product = await getProductById(req.params.id);
-    res.status(200).send(product);
+    const response = await getProductById(req.params.id);
+    res.status(response.statusCode).send(response.data);
   })
 );
 
