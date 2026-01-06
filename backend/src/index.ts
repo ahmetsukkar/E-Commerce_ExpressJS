@@ -6,6 +6,7 @@ import productRoute from "./routes/productRoute";
 import cartRoute from "./routes/cartRoute";
 import { seedInitialProducts } from "./services/productService";
 import { errorHandler } from "./middlewares/errorHandler";
+import cors from "cors";
 
 dotenv.config();
 
@@ -13,6 +14,10 @@ const app = express();
 const PORT = 5001;
 
 app.use(express.json());
+app.use(cors());
+// app.use(cors({
+//   origin: 'http://localhost:5173'
+// }));
 
 mongoose
   .connect(process.env.CONNECTION_STRING || '')
