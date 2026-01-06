@@ -10,7 +10,7 @@ router.post(
   asyncHandler(async (req: ExtendRequest, res: Response) => {
     var { firstName, lastName, email, password } = req.body;
     var result = await register({ firstName, lastName, email, password });
-    res.status(result.statusCode).send(result.data);
+    res.status(result.statusCode).json(result.data);
   })
 );
 
