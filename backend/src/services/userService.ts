@@ -45,12 +45,12 @@ export const login = async ({ email, password }: LoginParams) => {
   const user = await userModel.findOne({ email });
 
   if (!user) {
-    throw new AppError("invalid credentials! incorrect email or password", 400);
+    throw new AppError("User not found", 400);
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    throw new AppError("invalid credentials! incorrect email or password", 400);
+    throw new AppError("Password is incorrect", 400);
   }
 
   return {
