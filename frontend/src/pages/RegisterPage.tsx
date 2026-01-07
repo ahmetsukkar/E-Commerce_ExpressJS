@@ -1,6 +1,7 @@
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useRef, useState } from "react";
-import { BASE_URL } from "../constants/baseUrl";    
+import { BASE_URL } from "../constants/baseUrl";
+import { useAuth } from "../context/Auth/AuthContext";
 
 const RegisterPage = () => {
   const [error, setError] = useState("");
@@ -10,11 +11,18 @@ const RegisterPage = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
+  const { login } = useAuth();
+
   const onSubmit = async () => {
     const firstName = firstNameRef.current?.value;
     const lastName = lastNameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
+
+    if (!firstName || !lastName || !email || !password) {
+      setError("check submitted data");
+      return;
+    }
 
     const response = await fetch(`${BASE_URL}/user/register`, {
       method: "POST",
@@ -28,8 +36,13 @@ const RegisterPage = () => {
       return;
     }
 
-    const data = await response.json();
-    console.log(data);
+    const token = await response.json();
+
+    if (!token) {
+      return setError("Incorrect Token");
+    }
+
+    login(email, token);
   };
 
   return (
