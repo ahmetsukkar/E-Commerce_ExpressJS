@@ -21,7 +21,7 @@ const settings = ["My Orders", "Logout"];
 
 function Navbar() {
   const navigate = useNavigate();
-  const { username, isAuthenticated } = useAuth();
+  const { username, isAuthenticated, logout } = useAuth();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -42,6 +42,12 @@ function Navbar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    handleCloseUserMenu();
   };
 
   const handelLogin = () => {
@@ -168,7 +174,12 @@ function Navbar() {
                   onClose={handleCloseUserMenu}
                 >
                   {settings.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <MenuItem
+                      key={setting}
+                      onClick={
+                        setting == "Logout" ? handleLogout : handleCloseUserMenu
+                      }
+                    >
                       <Typography sx={{ textAlign: "center" }}>
                         {setting}
                       </Typography>
