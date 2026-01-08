@@ -12,8 +12,9 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdsClickIcon from "@mui/icons-material/AdsClick";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAuth } from "../context/Auth/AuthContext";
-import { Grid } from "@mui/material";
+import { Badge, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const pages = ["Products", "Pricing", "Blog"];
@@ -52,6 +53,10 @@ function Navbar() {
 
   const handelLogin = () => {
     navigate("/login");
+  };
+
+  const handelCart = () => {
+    navigate("/cart");
   };
 
   return (
@@ -134,7 +139,18 @@ function Navbar() {
               </Button>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          <Box
+            display={"flex"}
+            flexDirection={"row"}
+            gap={2}
+            alignItems={"center"}
+            justifyContent={"center"}
+          >
+            <IconButton aria-label="cart" onClick={handelCart}>
+              <Badge badgeContent={4} color="secondary">
+                <ShoppingCartIcon sx={{ color: "white" }} />
+              </Badge>
+            </IconButton>
             {isAuthenticated ? (
               <>
                 <Grid container gap={2}>
