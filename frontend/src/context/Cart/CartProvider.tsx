@@ -37,12 +37,13 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
       );
 
       setCartItems(cartItemsMapped);
+      setTotalAmount(cart.totalAmount);
     };
 
     fetchCart();
   }, [token]);
 
-  const addItemToCart = async (productId: string, quantity: number = 1) => {
+  const addItemToCart = async (productId: string, quantity?: number) => {
     try {
       const response = await fetch(`${BASE_URL}/cart/items`, {
         method: "POST",
@@ -70,7 +71,7 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
           productId: product._id,
           title: product.title,
           image: product.image,
-          quantity,
+          quantity: quantity ? quantity : 1,
           unitPrice: product.price,
         })
       );
