@@ -6,7 +6,8 @@ interface CartContextType {
   totalAmount: number;
   addItemToCart: (productId: string, quantity?: number) => void;
   updateItemInCart: (productId: string, quantity: number) => void;
-  removeItemInCart:(productId:string) => void;
+  removeItemInCart: (productId: string) => void;
+  clearCart: () => void;
 }
 
 export const CartContext = createContext<CartContextType>({
@@ -15,6 +16,7 @@ export const CartContext = createContext<CartContextType>({
   addItemToCart: () => {},
   updateItemInCart: () => {},
   removeItemInCart: () => {},
+  clearCart: () => {},
 });
 
 // Custom Hook (useCart)
