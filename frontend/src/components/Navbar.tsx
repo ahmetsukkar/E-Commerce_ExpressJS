@@ -47,6 +47,18 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
+  const handelMenuSettingClick = (setting: string) => {
+    if (setting == "Logout") {
+      handleLogout();
+      return;
+    }
+
+    if (setting == "My Orders") {
+      handelMyOrders();
+      return;
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -59,6 +71,11 @@ function Navbar() {
 
   const handelCart = () => {
     navigate("/cart");
+  };
+
+  const handelMyOrders = () => {
+    navigate("/myorders");
+    handleCloseUserMenu();
   };
 
   return (
@@ -207,9 +224,7 @@ function Navbar() {
                   {settings.map((setting) => (
                     <MenuItem
                       key={setting}
-                      onClick={
-                        setting == "Logout" ? handleLogout : handleCloseUserMenu
-                      }
+                      onClick={() => handelMenuSettingClick(setting)}
                     >
                       <Typography sx={{ textAlign: "center" }}>
                         {setting}

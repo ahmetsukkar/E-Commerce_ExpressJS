@@ -7,7 +7,7 @@ import type { Product } from "../../types/Product";
 
 const CartProvider: FC<PropsWithChildren> = ({ children }) => {
   const { token } = useAuth();
-  const [error, setError] = useState("");
+  const [, setError] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
 

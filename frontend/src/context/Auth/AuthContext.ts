@@ -6,6 +6,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (username: string, token: string) => void;
   logout: () => void;
+  getMyOrders: () => void;
+  myOrders: any[]
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -14,6 +16,8 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: () => {},
   logout: () => {},
+  getMyOrders: () => {},
+  myOrders:[]
 });
 
 // Custom Hook (useAuth)
