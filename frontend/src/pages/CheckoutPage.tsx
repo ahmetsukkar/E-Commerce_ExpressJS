@@ -2,10 +2,35 @@ import { Box, Container, TextField, Typography } from "@mui/material";
 import { useCart } from "../context/Cart/CartContext";
 import Button from "@mui/material/Button";
 import { useRef } from "react";
+import { BASE_URL } from "../constants/baseUrl";
+import { useAuth } from "../context/Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage = () => {
   const { cartItems, totalAmount } = useCart();
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const addressRef = useRef<HTMLInputElement>(null);
+
+  const handelConfirmOrder = async () => {
+    const address = addressRef.current?.value;
+    if (!address) return;
+
+    const response = await fetch(`${BASE_URL}/cart/checkout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ address }),
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    navigate("/ordersuccess");
+  };
 
   const renderCartItems = () => (
     <Box
@@ -51,7 +76,7 @@ const CheckoutPage = () => {
         </Box>
       ))}
       <Box>
-        <Typography variant="body2" sx={{textAlign: "right"}}>
+        <Typography variant="body2" sx={{ textAlign: "right" }}>
           Total Amount: {totalAmount.toFixed(2)} TL
         </Typography>
       </Box>
@@ -59,7 +84,10 @@ const CheckoutPage = () => {
   );
 
   return (
-    <Container fixed sx={{ mt: 2, display:"flex", flexDirection:"column", gap:2  }}>
+    <Container
+      fixed
+      sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}
+    >
       <Box
         display={"flex"}
         flexDirection={"row"}
@@ -68,9 +96,14 @@ const CheckoutPage = () => {
       >
         <Typography variant="h4">Checkout</Typography>
       </Box>
-      <TextField inputRef={addressRef} label="Delivery Address" name="address" fullWidth/>
+      <TextField
+        inputRef={addressRef}
+        label="Delivery Address"
+        name="address"
+        fullWidth
+      />
       {renderCartItems()}
-      <Button variant="contained" fullWidth>
+      <Button onClick={handelConfirmOrder} variant="contained" fullWidth>
         Pay Now
       </Button>
     </Container>
